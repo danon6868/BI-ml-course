@@ -32,7 +32,7 @@ class KNNClassifier:
         if n_loops == 0:
             distances = self.compute_distances_no_loops(X)
         elif n_loops == 1:
-            distances = self.compute_distances_one_loops(X)
+            distances = self.compute_distances_one_loop(X)
         else:
             distances = self.compute_distances_two_loops(X)
         
@@ -55,10 +55,12 @@ class KNNClassifier:
            with distances between each test and each train sample
         """
         
-        """
-        YOUR CODE IS HERE
-        """
-        pass
+        # циклы по объектам test и train
+        l1_dist = np.zeros((X.shape[0], self.train_X.shape[0]))
+        for i in range(X.shape[0]):
+            for j in range(self.train_X.shape[0]):
+                l1_dist[i, j] = np.sum(np.abs(X[i] - self.train_X[j]))
+        return l1_dist
 
 
     def compute_distances_one_loop(self, X):
@@ -74,11 +76,15 @@ class KNNClassifier:
            with distances between each test and each train sample
         """
 
-        """
-        YOUR CODE IS HERE
-        """
-        pass
-
+        # цикл только по размерности test куска (можно аналогично по train)
+        # каждая строка из test массива вычитается из всего train массива
+        # далее ищется сумма строк в train массиве и дописывается новой строкой в l1_dist
+        
+        l1_dist = np.ndarray((0, self.train_X.shape[0]))
+        for i in range(X.shape[0]):
+            l1_dist = np.append(l1_dist, [np.sum(np.abs((X[i] - self.train_X)), axis = 1)], axis = 0)
+        return l1_dist
+    
 
     def compute_distances_no_loops(self, X):
         """
@@ -93,10 +99,8 @@ class KNNClassifier:
            with distances between each test and each train sample
         """
 
-        """
-        YOUR CODE IS HERE
-        """
-        pass
+        l1_dist = np.abs(X[:,None] - self.train_X).sum(-1)
+        return l1_dist
 
 
     def predict_labels_binary(self, distances):
@@ -113,12 +117,20 @@ class KNNClassifier:
 
         n_train = distances.shape[1]
         n_test = distances.shape[0]
-        prediction = np.zeros(n_test)
+        prediction = np.zeros(n_test, dtype = 'int')
 
-        """
-        YOUR CODE IS HERE
-        """
-        pass
+        for i in range(n_test):
+            # сначала находим индексы k минимальных значений дистанции
+            # функция argpartition не сортирует массив полностью, 
+            #     а двигает лишь первые k элементов (они также могут получится неотсортированными) 
+            idx = np.argpartition(distances[i], self.k)[:self.k]
+            
+            # теперь смотрим на классы train_y по этим индексам
+            classes = self.train_y[idx]
+            # выберем наиболее часто встречающийся класс как предсказание
+            prediction[i] = np.bincount(classes).argmax()
+                
+        return prediction
 
 
     def predict_labels_multiclass(self, distances):
@@ -136,8 +148,18 @@ class KNNClassifier:
         n_train = distances.shape[0]
         n_test = distances.shape[0]
         prediction = np.zeros(n_test, np.int)
+        
+        # я просто скопировал функцию для бинарной классификации *первернутый эмоджи*
 
-        """
-        YOUR CODE IS HERE
-        """
-        pass
+        for i in range(n_test):
+            # сначала находим индексы k минимальных значений дистанции
+            # функция argpartition не сортирует массив полностью, 
+            #     а двигает лишь первые k элементов (они также могут получится неотсортированными) 
+            idx = np.argpartition(distances[i], self.k)[:self.k]
+            
+            # теперь смотрим на классы train_y по этим индексам
+            classes = self.train_y[idx]
+            # выберем наиболее часто встречающийся класс как предсказание
+            prediction[i] = np.bincount(classes).argmax()
+                
+        return prediction

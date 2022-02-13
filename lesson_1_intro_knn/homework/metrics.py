@@ -16,10 +16,30 @@ def binary_classification_metrics(y_pred, y_true):
     # https://en.wikipedia.org/wiki/Precision_and_recall
     # https://en.wikipedia.org/wiki/F1_score
 
-    """
-    YOUR CODE IS HERE
-    """
-    pass
+    true_positive  = tp = np.sum((y_pred == 1) * (y_true == 1))
+    false_positive = fp = np.sum((y_pred == 1) * (y_true == 0))
+    true_negative  = tn = np.sum((y_pred == 0) * (y_true == 0))
+    false_negative = fn = np.sum((y_pred == 0) * (y_true == 1))
+
+    try:
+        precision = tp / (tp + fp)
+    except ZeroDivisionError:
+        precision = 0.0
+        
+    try:
+        recall = tp / (tp + fn)
+    except ZeroDivisionError:
+        recall = 0.0
+    
+    accuracy = (tp + tn) / (tp + tn + fp + fn)
+    
+    try:
+        f1_score = 2 * precision * recall / (precision + recall)
+    except ZeroDivisionError:
+        f1_score = 0.0
+    
+
+    return precision, recall, f1_score, accuracy
 
 
 def multiclass_accuracy(y_pred, y_true):
@@ -32,10 +52,8 @@ def multiclass_accuracy(y_pred, y_true):
     accuracy - ratio of accurate predictions to total samples
     """
 
-    """
-    YOUR CODE IS HERE
-    """
-    pass
+    accuracy = np.sum(y_pred == y_true) / y_true.shape[0]
+    return accuracy
 
 
 def r_squared(y_pred, y_true):
@@ -48,10 +66,8 @@ def r_squared(y_pred, y_true):
     r2 - r-squared value
     """
 
-    """
-    YOUR CODE IS HERE
-    """
-    pass
+    r2_score = 1 - np.sum((y_true - y_pred) ** 2) / np.sum((y_true - np.mean(y_true)) ** 2)
+    return r2_score
 
 
 def mse(y_pred, y_true):
@@ -64,10 +80,8 @@ def mse(y_pred, y_true):
     mse - mean squared error
     """
 
-    """
-    YOUR CODE IS HERE
-    """
-    pass
+    mse = (1 / y_true.shape[0]) * np.sum((y_true - y_pred) ** 2)
+    return mse
 
 
 def mae(y_pred, y_true):
@@ -80,8 +94,6 @@ def mae(y_pred, y_true):
     mae - mean absolut error
     """
 
-    """
-    YOUR CODE IS HERE
-    """
-    pass
+    mae = (1 / y_true.shape[0]) * np.sum(np.abs(y_true - y_pred))
+    return mae
     
