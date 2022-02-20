@@ -16,10 +16,27 @@ def binary_classification_metrics(y_pred, y_true):
     # https://en.wikipedia.org/wiki/Precision_and_recall
     # https://en.wikipedia.org/wiki/F1_score
 
-    """
-    YOUR CODE IS HERE
-    """
-    pass
+    TP = FP = TN = FN = 0
+    for i in range(len(y_pred)):
+        if y_pred[i] == y_true[i]:
+            if y_true[i] == 1:
+                TP += 1
+            else:
+                TN += 1
+        else:
+            if y_true[i] == 1:
+                FP += 1
+            else:
+                FN += 1
+
+    precision = TP / (TP + FP) if TP + FP != 0 else None
+    recall = TP / (TP + FN) if TP + FN != 0 else None
+    accuracy = (TP + TN) / (TP + TN + FP + FN) if (TP + TN + FP + FN) != 0 else None
+    f1 = ((2 * precision * recall) / (precision + recall) 
+          if (precision is not None) and (recall is not None) and (precision + recall) != 0 
+          else None)
+    return precision, recall, accuracy, f1
+           
 
 
 def multiclass_accuracy(y_pred, y_true):
@@ -47,11 +64,15 @@ def r_squared(y_pred, y_true):
     Returns:
     r2 - r-squared value
     """
+    sum1 = sum2 = 0
+    mean_y = np.mean(y_true)
+    for i in range(len(y_true)):
+        sum1 += (y_true[i] - y_pred[i]) **2
+        sum2 += (y_true[i] - mean_y) ** 2
+    r2 = 1 - (sum1 / sum2)
+    return r2
 
-    """
-    YOUR CODE IS HERE
-    """
-    pass
+    
 
 
 def mse(y_pred, y_true):
@@ -63,11 +84,13 @@ def mse(y_pred, y_true):
     Returns:
     mse - mean squared error
     """
+    sum = 0
+    N = len(y_true)
+    for i in range(N):
+        sum += (y_true[i] - y_pred[i]) ** 2
+    mse = (1 / N) * sum
+    return mse
 
-    """
-    YOUR CODE IS HERE
-    """
-    pass
 
 
 def mae(y_pred, y_true):
@@ -79,9 +102,9 @@ def mae(y_pred, y_true):
     Returns:
     mae - mean absolut error
     """
-
-    """
-    YOUR CODE IS HERE
-    """
-    pass
-    
+    sum = 0
+    N = len(y_true)
+    for i in range(N):
+        sum += abs(y_true[i] - y_pred[i])
+    mae = (1 / N) * sum
+    return mae
